@@ -1,18 +1,18 @@
 import "./App.css";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Popup from "./components/Popup";
 
 function App() {
   const [step, setStep] = useState("login");
   const [messageFromServer, setMessageFromServer] = useState("");
   const [ipLastNumber, setIpLastNumber] = useState("");
-
+  const ws = useRef(null);
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:3000"); // Remplacez par l'URL de votre serveur WebSocket
+    const ws = new WebSocket("ws://localhost:4000");
 
     ws.onopen = () => {
       console.log("Connected to server");
-      ws.send("Hello from client"); // Envoyer un message au serveur
+      ws.send("Hello from client");
     };
 
     ws.onmessage = (event) => {
@@ -26,9 +26,15 @@ function App() {
     };
 
     return () => {
-      ws.close(); // Fermez la connexion WebSocket lorsque le composant est démonté
+      ws.close();
     };
-  }, []); // Effectuée uniquement lors du montage du composant
+  }, []);
+
+  const sendMessage = () => {
+    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+      ws.current.send("Hello from React!");
+    }
+  };
 
   const handleLogin = () => {
     if (ipLastNumber && /^\d+$/.test(ipLastNumber)) {
@@ -63,6 +69,7 @@ function App() {
             </div>
 
             <button onClick={handleLogin}>Login</button>
+            <button onClick={sendMessage}>Send Message</button>
           </div>
         )}
 
