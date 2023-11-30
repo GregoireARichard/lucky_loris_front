@@ -3,8 +3,10 @@ import React, { useEffect, useState } from "react";
 import Popup from "./components/Popup";
 
 function App() {
+  const [step, setStep] = useState("login");
   const [isPopupOpen, setPopupOpen] = useState(true);
   const [messageFromServer, setMessageFromServer] = useState("");
+  const [ipLastNumber, setIpLastNumber] = useState("");
 
   useEffect(() => {
     const ws = new WebSocket("ws://localhost:3000"); // Remplacez par l'URL de votre serveur WebSocket
@@ -30,13 +32,41 @@ function App() {
     };
   }, []); // Effectuée uniquement lors du montage du composant
 
-  const handleClosePopup = () => {
-    setPopupOpen(false);
+  const handleLogin = () => {
+    const ws = new WebSocket("ws://localhost:3000");
+    ws.onopen = () => {
+      ws.send(`Ip: ${ipLastNumber}`);
+    };
+    setStep("popup");
   };
+
+  const handleClosePopup = () => {
+    setStep("main");
+  };
+
   return (
     <div className="App">
       <header className="App-header">
-        {isPopupOpen && <Popup onClose={handleClosePopup} />}
+        {step === "login" && (
+          <div>
+            <label htmlFor="ipLastNumber">Ip last number:</label>
+            <input
+              type="number"
+              id="ipLastNumber"
+              value={ipLastNumber}
+              onChange={(e) => setIpLastNumber(e.target.value)}
+            />
+            <button onClick={handleLogin}>Login</button>
+          </div>
+        )}
+
+        {step === "popup" && <Popup onClose={handleClosePopup} />}
+
+        {step === "main" && (
+          <div>
+            <p>this is the main page</p>
+          </div>
+        )}
       </header>
     </div>
   );

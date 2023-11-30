@@ -2,7 +2,7 @@ import React from "react";
 
 const Popup = ({ onClose }) => {
   return (
-    <div className=" fixed top-0 left-0 w-full h-full bg-red-200 flex justify-center items-center">
+    <div className=" fixed top-0 left-0 w-full h-full bg-gray-200/75 flex justify-center items-center">
       <div className="p-5 rounded-md">
         <p>Contenu de la popup</p>
         <button
