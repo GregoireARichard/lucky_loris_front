@@ -9,7 +9,6 @@ const Popup = ({ onClose }) => {
           onClick={onClose}
           className="rounded-lg px-4 py-2 border-grey-500 border-2 hover:bg-red-500 hover:border-red-500 hover:cursor-pointer  "
         >
-          {" "}
           Start game
         </button>
       </div>

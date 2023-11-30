@@ -1,6 +1,7 @@
 import "./App.css";
 import React, { useEffect, useState, useRef } from "react";
 import Popup from "./components/Popup";
+import crosshair from "./icons/crosshair.svg";
 
 function App() {
   const [step, setStep] = useState("login");
@@ -56,20 +57,43 @@ function App() {
     <div className="App">
       <header className="App-header">
         {step === "login" && (
-          <div className="grid grid-rows-2">
-            <div className=" border-gray-300 border-2 px-5 rounded-full space-x-2">
-              <label htmlFor="ipLastNumber">Ip last number:</label>
-              <input
-                type="number"
-                id="ipLastNumber"
-                value={ipLastNumber}
-                onChange={(e) => setIpLastNumber(e.target.value)}
-                className="border-none w-24 outline-none"
+          <div className="gap-y-2">
+            <div className="absolute top-56 w-full left-0 space-y-2">
+              <h1 className="text-6xl text-red-600 font-bold">Lucky Loris</h1>
+
+              <p className="text-xs">c'est pas moi qui ai trouvé le nom</p>
+            </div>
+            <div className=" flex w-full items-center justify-center">
+              <img
+                src={crosshair}
+                alt="crosshair"
+                className="text-red-500 w-52 h-auto"
               />
             </div>
 
-            <button onClick={handleLogin}>Login</button>
-            <button onClick={sendMessage}>Send Message</button>
+            <div className="flex gap-x-5">
+              <div className="relative w-80">
+                <label
+                  htmlFor="ipLastNumber"
+                  className="absolute bottom-0 left-0 top-0 flex w-auto px-5  "
+                >
+                  Ip last number:
+                </label>
+                <input
+                  type="texte"
+                  id="ipLastNumber"
+                  value={ipLastNumber}
+                  onChange={(e) => setIpLastNumber(e.target.value)}
+                  className=" pl-56 h-11 w-full rounded-full border border-red-500 px-3 outline-none hover:border-green-water-500 hover:bg-gray-200 ring-red-500 ring-opacity-60 focus:ring focus:hover:bg-transparent"
+                />
+              </div>
+              <button
+                onClick={handleLogin}
+                className="px-5 relative flex items-center justify-center gap-2 whitespace-nowrap rounded-full border-grey-500 border-2 hover:bg-red-500 hover:border-red-500 hover:cursor-pointer"
+              >
+                Login
+              </button>
+            </div>
           </div>
         )}
 
