@@ -64,11 +64,7 @@ function App() {
               <p className="text-xs">c'est pas moi qui ai trouvé le nom</p>
             </div>
             <div className=" flex w-full items-center justify-center">
-              <img
-                src={crosshair}
-                alt="crosshair"
-                className="text-red-500 w-52 h-auto"
-              />
+              <img src={crosshair} alt="crosshair" className=" w-52 h-auto" />
             </div>
 
             <div className="flex gap-x-5">
