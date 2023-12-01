@@ -12,9 +12,6 @@ function App() {
   const [gameStarted, setGameStarted] = useState(false);
   const [spaceBarClicked, setSpaceBarClicked] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
-  const [intervalId, setIntervalId] = useState(null);
-
-  const [countdownIntervalId, setCountdownIntervalId] = useState(null);
   const [chronometerIntervalId, setChronometerIntervalId] = useState(null);
   const ws = useRef(null);
 
@@ -49,6 +46,13 @@ function App() {
     }
   };
 
+  const sendReadiness = () => {
+    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+      ws.current.send(JSON.stringify({ route: "readiness", data: true }));
+    }
+  };
+  console.log();
+
   const handleLogin = () => {
     if (
       ipLastNumber &&
@@ -74,22 +78,17 @@ function App() {
     setStep("main");
     setGameStarted(true);
     setCountdown(5);
+    setElapsedTime(0);
+    const id = setInterval(() => {
+      setElapsedTime((prevTime) => prevTime + 1);
+    }, 1);
+    setChronometerIntervalId(id);
+    setCountdownFinished(false);
 
-    const startTime = Date.now();
-
-    const countdownIntervalId = setInterval(() => {
-      setCountdown((prevCountdown) => {
-        if (prevCountdown > 0) {
-          return prevCountdown - 1;
-        } else {
-          clearInterval(countdownIntervalId);
-          startChronometer(startTime);
-          return 0;
-        }
-      });
-    }, 1000);
-
-    setCountdownIntervalId(countdownIntervalId);
+    setTimeout(() => {
+      clearInterval(id);
+      setCountdownFinished(true);
+    }, 5000);
   };
 
   useEffect(() => {
@@ -120,9 +119,9 @@ function App() {
   };
 
   const handleSpaceKeyPress = (e) => {
-    if (e.key === "Space" && countdown === 0) {
+    if (e.code === "Space" && countdownFinished && !spaceBarClicked) {
       setSpaceBarClicked(true);
-      clearInterval(chronometerIntervalId); // Arrêter le chronomètre lorsque la barre d'espace est pressée
+      clearInterval(chronometerIntervalId);
       console.log("Space key pressed after countdown");
     }
   };
@@ -173,7 +172,11 @@ function App() {
         )}
 
         {step === "popup" && (
-          <Popup onClose={handleClosePopup} onStartGame={handleStartGame} />
+          <Popup
+            onClose={handleClosePopup}
+            onStartGame={handleStartGame}
+            isReady={sendReadiness}
+          />
         )}
 
         {step === "main" && (
@@ -183,15 +186,20 @@ function App() {
                 <p>{countdown}</p>
               </div>
             )}
-            {countdown !== null && countdown === 0 && (
-              <div className="text-8xl text-white">
-                <p>Press space bar !</p>
-              </div>
-            )}
+            {(countdown !== null && countdown === 0) ||
+              (!spaceBarClicked && countdown !== null && (
+                <div className="text-8xl text-white">
+                  <p>Press space bar !</p>
+                </div>
+              ))}
             {spaceBarClicked && (
               <div>
-                <div className="text-8xl text-white">
-                  <p>Space bar clicked!</p>
+                <div className="flex w-full items-center justify-center">
+                  <img
+                    src={crosshair}
+                    alt="crosshair"
+                    className="w-52 h-auto"
+                  />
                 </div>
                 <div className="text-2xl text-white">
                   <p>Elapsed time: {elapsedTime} ms</p>

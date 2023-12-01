@@ -1,10 +1,14 @@
 import React from "react";
 import crosshair from "../icons/crosshair.svg";
 
-const Popup = ({ onClose, onStartGame }) => {
+const Popup = ({ onClose, onStartGame, isReady }) => {
   const handleButtonClick = () => {
     onClose();
     onStartGame(); // Démarrer le jeu lorsque le bouton est cliqué
+  };
+
+  const handleReadyClick = () => {
+    isReady();
   };
   return (
     <div className=" fixed top-0 left-0 w-full h-full bg-gray-200/75 flex justify-center items-center">
@@ -31,9 +35,14 @@ const Popup = ({ onClose, onStartGame }) => {
             unthinkable suffering
           </p>
         </div>
-
         <button
-          onClick={onClose}
+          onClick={handleReadyClick}
+          className="rounded-full px-4 py-2 border-red-500 border-2 hover:bg-red-500 hover:border-red-500 hover:cursor-pointer disabled:cursor-not-allowed"
+        >
+          Ready ?
+        </button>
+        <button
+          onClick={handleButtonClick}
           className="rounded-full px-4 py-2 border-red-500 border-2 hover:bg-red-500 hover:border-red-500 hover:cursor-pointer disabled:cursor-not-allowed"
         >
           Start game
