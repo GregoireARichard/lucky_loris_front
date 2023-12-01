@@ -9,7 +9,7 @@ function App() {
   const [ipLastNumber, setIpLastNumber] = useState("");
   const ws = useRef(null);
   useEffect(() => {
-    ws.current = new WebSocket(`ws://localhost:4000`);
+    ws.current = new WebSocket(`ws://192.168.34.175:4000`);
 
     ws.current.onopen = () => {
       console.log("Connected to WebSocket server");
@@ -42,16 +42,17 @@ function App() {
   };
 
   const handleLogin = () => {
+    console.log(ws.current, '______')
     if (
       ipLastNumber &&
       /^\d+$/.test(ipLastNumber) &&
       ws.current &&
       ws.current.readyState === WebSocket.OPEN
     ) {
-      ws.current.send(`Ip: ${ipLastNumber}`);
+      ws.current.send(JSON.stringify({ route: 'ip', data: ipLastNumber }));
       setStep("popup");
     } else {
-      alert("Please enter a valid ip number");
+      alert("Please enter a valid ip number or start your server");
     }
   };
 
