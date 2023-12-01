@@ -24,6 +24,10 @@ function App() {
 
     ws.current.onmessage = (event) => {
       console.log(`Received: ${event.data}`);
+      if ((event.data === "winner") | (event.data === "loser")) {
+        alert(`${event.data}`);
+      }
+
       // Handle the received message from the WebSocket server
     };
 
@@ -51,7 +55,6 @@ function App() {
       ws.current.send(JSON.stringify({ route: "readiness", data: true }));
     }
   };
-  console.log();
 
   const sendReactionTime = () => {
     if (ws.current && ws.current.readyState === WebSocket.OPEN) {
@@ -60,6 +63,7 @@ function App() {
       );
     }
   };
+  console.log({ sendReactionTime });
 
   const handleLogin = () => {
     if (
