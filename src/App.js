@@ -53,6 +53,14 @@ function App() {
   };
   console.log();
 
+  const sendReactionTime = () => {
+    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+      ws.current.send(
+        JSON.stringify({ route: "reaction-time", data: elapsedTime })
+      );
+    }
+  };
+
   const handleLogin = () => {
     if (
       ipLastNumber &&
@@ -122,6 +130,7 @@ function App() {
     if (e.code === "Space" && countdownFinished && !spaceBarClicked) {
       setSpaceBarClicked(true);
       clearInterval(chronometerIntervalId);
+      sendReactionTime();
       console.log("Space key pressed after countdown");
     }
   };
