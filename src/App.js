@@ -8,40 +8,41 @@ function App() {
   const [ipLastNumber, setIpLastNumber] = useState("");
   const ws = useRef(null);
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:4000");
+    ws.current = new WebSocket(`ws://localhost:4000`);
 
-    ws.onopen = () => {
-      console.log("Connected to server");
-      ws.send("Hello from client");
+    ws.current.onopen = () => {
+      console.log('Connected to WebSocket server');
     };
 
-    ws.onmessage = (event) => {
-      console.log("Received from server:", event.data);
-      setMessageFromServer(event.data);
-      // Gérez les données reçues du serveur, par exemple, déclenchez l'ouverture de la popup
+    ws.current.onmessage = (event) => {
+      console.log(`Received: ${event.data}`);
+      // Handle the received message from the WebSocket server
     };
 
-    ws.onclose = () => {
-      console.log("Disconnected from server");
+    ws.current.onclose = () => {
+      console.log('Disconnected from WebSocket server');
+    };
+
+    ws.current.onerror = (error) => {
+      console.error('WebSocket error:', error.message);
     };
 
     return () => {
-      ws.close();
+      // Clean up WebSocket connection on component unmount
+      ws.current.close();
     };
   }, []);
 
   const sendMessage = () => {
     if (ws.current && ws.current.readyState === WebSocket.OPEN) {
-      ws.current.send("Hello from React!");
+      // Send a message to the WebSocket server
+      ws.current.send('Hello from React!');
     }
   };
 
   const handleLogin = () => {
-    if (ipLastNumber && /^\d+$/.test(ipLastNumber)) {
-      const ws = new WebSocket("ws://localhost:3000");
-      ws.onopen = () => {
-        ws.send(`Ip: ${ipLastNumber}`);
-      };
+    if (ipLastNumber && /^\d+$/.test(ipLastNumber) && ws.current && ws.current.readyState === WebSocket.OPEN) {
+      ws.current.send(`Ip: ${ipLastNumber}`); 
       setStep("popup");
     } else {
       alert("Please enter a valid ip number");
