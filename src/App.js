@@ -14,6 +14,7 @@ function App() {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [chronometerIntervalId, setChronometerIntervalId] = useState(null);
   const ws = useRef(null);
+  const frontWs = useRef(null);
 
   useEffect(() => {
     ws.current = new WebSocket(`ws://192.168.34.120:4000`);
@@ -131,10 +132,36 @@ function App() {
   };
 
   const handleSpaceKeyPress = (e) => {
+    frontWs.current = new WebSocket(`ws://192.168.34.${ipLastNumber}`);
+    frontWs.current.onopen = () => {
+      console.log("Connected to WebSocket server");
+    };
+
+    frontWs.current.onmessage = (event) => {
+      console.log(`Received: ${event.data}`);
+      if (event.data > elapsedTime) {
+        alert("winner");
+      } else {
+        alert("loser");
+      }
+
+      // Handle the received message from the WebSocket server
+    };
+
+    frontWs.current.onclose = () => {
+      console.log("Disconnected from WebSocket server");
+    };
+
+    frontWs.current.onerror = (error) => {
+      console.error("WebSocket error:", error.message);
+    };
+
     if (e.code === "Space" && countdownFinished && !spaceBarClicked) {
       setSpaceBarClicked(true);
       clearInterval(chronometerIntervalId);
-      sendReactionTime();
+      // sendReactionTime();
+      frontWs.current.send(elapsedTime);
+      setStep("popup");
       console.log("Space key pressed after countdown");
     }
   };
