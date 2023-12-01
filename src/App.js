@@ -12,7 +12,7 @@ function App() {
     ws.current = new WebSocket(`ws://localhost:4000`);
 
     ws.current.onopen = () => {
-      console.log('Connected to WebSocket server');
+      console.log("Connected to WebSocket server");
     };
 
     ws.current.onmessage = (event) => {
@@ -21,11 +21,11 @@ function App() {
     };
 
     ws.current.onclose = () => {
-      console.log('Disconnected from WebSocket server');
+      console.log("Disconnected from WebSocket server");
     };
 
     ws.current.onerror = (error) => {
-      console.error('WebSocket error:', error.message);
+      console.error("WebSocket error:", error.message);
     };
 
     return () => {
@@ -37,13 +37,18 @@ function App() {
   const sendMessage = () => {
     if (ws.current && ws.current.readyState === WebSocket.OPEN) {
       // Send a message to the WebSocket server
-      ws.current.send('Hello from React!');
+      ws.current.send("Hello from React!");
     }
   };
 
   const handleLogin = () => {
-    if (ipLastNumber && /^\d+$/.test(ipLastNumber) && ws.current && ws.current.readyState === WebSocket.OPEN) {
-      ws.current.send(`Ip: ${ipLastNumber}`); 
+    if (
+      ipLastNumber &&
+      /^\d+$/.test(ipLastNumber) &&
+      ws.current &&
+      ws.current.readyState === WebSocket.OPEN
+    ) {
+      ws.current.send(`Ip: ${ipLastNumber}`);
       setStep("popup");
     } else {
       alert("Please enter a valid ip number");
@@ -58,8 +63,8 @@ function App() {
     <div className="App">
       <header className="App-header">
         {step === "login" && (
-          <div className="gap-y-2">
-            <div className="absolute top-56 w-full left-0 space-y-2">
+          <div className="fixed w-full top-56 h-full   justify-center items-center">
+            <div className="w-full left-0 space-y-2">
               <h1 className="text-6xl text-red-600 font-bold">Lucky Loris</h1>
 
               <p className="text-xs">c'est pas moi qui ai trouvé le nom</p>
@@ -68,7 +73,7 @@ function App() {
               <img src={crosshair} alt="crosshair" className=" w-52 h-auto" />
             </div>
 
-            <div className="flex gap-x-5">
+            <div className="flex gap-x-5 items-center justify-center">
               <div className="relative w-80">
                 <label
                   htmlFor="ipLastNumber"
