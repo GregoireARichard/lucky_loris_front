@@ -9,7 +9,7 @@ function App() {
   const [ipLastNumber, setIpLastNumber] = useState("");
   const ws = useRef(null);
   useEffect(() => {
-    ws.current = new WebSocket(`ws://localhost:4000`);
+    ws.current = new WebSocket(`ws://192.168.34.120:4000`);
 
     ws.current.onopen = () => {
       console.log("Connected to WebSocket server");
@@ -44,9 +44,9 @@ function App() {
   const handleLogin = () => {
     if (
       ipLastNumber &&
-      /^\d+$/.test(ipLastNumber) &&
-      ws.current &&
-      ws.current.readyState === WebSocket.OPEN
+      /^\d+$/.test(ipLastNumber)
+      //&& ws.current &&
+      //ws.current.readyState === WebSocket.OPEN
     ) {
       ws.current.send(`Ip: ${ipLastNumber}`);
       setStep("popup");
@@ -91,7 +91,7 @@ function App() {
               </div>
               <button
                 onClick={handleLogin}
-                className="px-5 relative flex items-center justify-center gap-2 whitespace-nowrap rounded-full border-grey-500 border-2 hover:bg-red-500 hover:border-red-500 hover:cursor-pointer"
+                className="px-5 relative flex items-center justify-center gap-2 whitespace-nowrap rounded-full border-red-500 border-2 hover:bg-red-500 hover:border-red-500 hover:cursor-pointer"
               >
                 Login
               </button>
@@ -103,7 +103,9 @@ function App() {
 
         {step === "main" && (
           <div>
-            <p>this is the main page</p>
+            <div className=" flex w-full items-center justify-center">
+              <img src={crosshair} alt="crosshair" className=" w-56 h-auto" />
+            </div>
           </div>
         )}
       </header>
