@@ -1,7 +1,11 @@
 import React from "react";
 import crosshair from "../icons/crosshair.svg";
 
-const Popup = ({ onClose }) => {
+const Popup = ({ onClose, onStartGame }) => {
+  const handleButtonClick = () => {
+    onClose();
+    onStartGame(); // Démarrer le jeu lorsque le bouton est cliqué
+  };
   return (
     <div className=" fixed top-0 left-0 w-full h-full bg-gray-200/75 flex justify-center items-center">
       <div className="p-5 space-y-5">
@@ -13,14 +17,15 @@ const Popup = ({ onClose }) => {
         </div>
         <div className=" justify-normal">
           <p>
-            When you or your opponent are ready, click on Start game button and
-            the game will start !
+            When you are ready, click on the Start game button and the game will
+            start !
           </p>
-        </div>
-        <div className="rounded-lg border-l-8 border-yellow-500 bg-yellow-50 justify-center items-start">
+
           <p>
             After the countdown is finish, you'll have to press the space bar.
           </p>
+        </div>
+        <div className="rounded-lg border-l-8 border-yellow-500 bg-yellow-50 justify-center items-start px-5 py-3">
           <p>
             The quickest player win and live while the other lose and die in
             unthinkable suffering

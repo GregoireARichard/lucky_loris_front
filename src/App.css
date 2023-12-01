@@ -20,6 +20,9 @@
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
+  background-image: url("./background-image.jpeg");
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .App-link {

@@ -7,9 +7,19 @@ function App() {
   const [step, setStep] = useState("login");
   const [messageFromServer, setMessageFromServer] = useState("");
   const [ipLastNumber, setIpLastNumber] = useState("");
+  const [countdown, setCountdown] = useState(null);
+  const [countdownFinished, setCountdownFinished] = useState(false);
+  const [gameStarted, setGameStarted] = useState(false);
+  const [spaceBarClicked, setSpaceBarClicked] = useState(false);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const [intervalId, setIntervalId] = useState(null);
+
+  const [countdownIntervalId, setCountdownIntervalId] = useState(null);
+  const [chronometerIntervalId, setChronometerIntervalId] = useState(null);
   const ws = useRef(null);
+
   useEffect(() => {
-    ws.current = new WebSocket(`ws://192.168.34.175:4000`);
+    ws.current = new WebSocket(`ws://192.168.34.120:4000`);
 
     ws.current.onopen = () => {
       console.log("Connected to WebSocket server");
@@ -29,27 +39,24 @@ function App() {
     };
 
     return () => {
-      // Clean up WebSocket connection on component unmount
       ws.current.close();
     };
   }, []);
 
   const sendMessage = () => {
     if (ws.current && ws.current.readyState === WebSocket.OPEN) {
-      // Send a message to the WebSocket server
       ws.current.send("Hello from React!");
     }
   };
 
   const handleLogin = () => {
-    console.log(ws.current, '______')
     if (
       ipLastNumber &&
-      /^\d+$/.test(ipLastNumber)
-      && ws.current &&
+      /^\d+$/.test(ipLastNumber) &&
+      ws.current &&
       ws.current.readyState === WebSocket.OPEN
     ) {
-      ws.current.send(JSON.stringify({ route: 'ip', data: ipLastNumber }));
+      ws.current.send(JSON.stringify({ route: "ip", data: ipLastNumber }));
       setStep("popup");
     } else {
       alert("Please enter a valid ip number or start your server");
@@ -58,36 +65,101 @@ function App() {
 
   const handleClosePopup = () => {
     setStep("main");
+    setCountdown(5);
+    setCountdownFinished(false);
+    setSpaceBarClicked(false);
   };
+
+  const handleStartGame = () => {
+    setStep("main");
+    setGameStarted(true);
+    setCountdown(5);
+
+    const startTime = Date.now();
+
+    const countdownIntervalId = setInterval(() => {
+      setCountdown((prevCountdown) => {
+        if (prevCountdown > 0) {
+          return prevCountdown - 1;
+        } else {
+          clearInterval(countdownIntervalId);
+          startChronometer(startTime);
+          return 0;
+        }
+      });
+    }, 1000);
+
+    setCountdownIntervalId(countdownIntervalId);
+  };
+
+  useEffect(() => {
+    let timer;
+
+    if (countdown !== null && countdown > 0) {
+      timer = setTimeout(() => {
+        setCountdown(countdown - 1);
+      }, 1000);
+    } else if (countdown === 0 && gameStarted) {
+      setCountdownFinished(true);
+      console.log("Game starts!");
+    }
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [countdown, gameStarted]);
+
+  const startChronometer = (startTime) => {
+    const chronometerIntervalId = setInterval(() => {
+      const currentTime = Date.now();
+      const elapsedTime = currentTime - startTime;
+      setElapsedTime(elapsedTime);
+    }, 10);
+
+    setChronometerIntervalId(chronometerIntervalId);
+  };
+
+  const handleSpaceKeyPress = (e) => {
+    if (e.key === "Space" && countdown === 0) {
+      setSpaceBarClicked(true);
+      clearInterval(chronometerIntervalId); // Arrêter le chronomètre lorsque la barre d'espace est pressée
+      console.log("Space key pressed after countdown");
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleSpaceKeyPress);
+    return () => {
+      window.removeEventListener("keydown", handleSpaceKeyPress);
+    };
+  }, [countdownFinished, spaceBarClicked]);
 
   return (
     <div className="App">
       <header className="App-header">
         {step === "login" && (
-          <div className="fixed w-full top-56 h-full   justify-center items-center">
+          <div className="fixed w-1/2 top-48 h-1/2 justify-center items-center bg-white/60 p-10 rounded-lg">
             <div className="w-full left-0 space-y-2">
               <h1 className="text-6xl text-red-600 font-bold">Lucky Loris</h1>
-
               <p className="text-xs">c'est pas moi qui ai trouvé le nom</p>
             </div>
-            <div className=" flex w-full items-center justify-center">
-              <img src={crosshair} alt="crosshair" className=" w-52 h-auto" />
+            <div className="flex w-full items-center justify-center">
+              <img src={crosshair} alt="crosshair" className="w-52 h-auto" />
             </div>
-
             <div className="flex gap-x-5 items-center justify-center">
               <div className="relative w-80">
                 <label
                   htmlFor="ipLastNumber"
-                  className="absolute bottom-0 left-0 top-0 flex w-auto px-5  "
+                  className="absolute bottom-0 left-0 top-0 flex w-auto px-5"
                 >
                   Ip last number:
                 </label>
                 <input
-                  type="texte"
+                  type="text"
                   id="ipLastNumber"
                   value={ipLastNumber}
                   onChange={(e) => setIpLastNumber(e.target.value)}
-                  className=" pl-56 h-11 w-full rounded-full border border-red-500 px-3 outline-none hover:border-green-water-500 hover:bg-gray-200 ring-red-500 ring-opacity-60 focus:ring focus:hover:bg-transparent"
+                  className="pl-56 h-11 w-full rounded-full border border-red-500 px-3 outline-none hover:border-green-water-500 hover:bg-gray-200 ring-red-500 ring-opacity-60 focus:ring"
                 />
               </div>
               <button
@@ -100,13 +172,32 @@ function App() {
           </div>
         )}
 
-        {step === "popup" && <Popup onClose={handleClosePopup} />}
+        {step === "popup" && (
+          <Popup onClose={handleClosePopup} onStartGame={handleStartGame} />
+        )}
 
         {step === "main" && (
           <div>
-            <div className=" flex w-full items-center justify-center">
-              <img src={crosshair} alt="crosshair" className=" w-56 h-auto" />
-            </div>
+            {countdown !== null && countdown !== 0 && (
+              <div className="text-8xl text-white">
+                <p>{countdown}</p>
+              </div>
+            )}
+            {countdown !== null && countdown === 0 && (
+              <div className="text-8xl text-white">
+                <p>Press space bar !</p>
+              </div>
+            )}
+            {spaceBarClicked && (
+              <div>
+                <div className="text-8xl text-white">
+                  <p>Space bar clicked!</p>
+                </div>
+                <div className="text-2xl text-white">
+                  <p>Elapsed time: {elapsedTime} ms</p>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </header>
